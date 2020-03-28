@@ -2,7 +2,7 @@ USGS Names Map Interface
 ========================
 Description
 -----------
-A [web interface](johnsherrill.heliohost.org/feature_map.php) for querying a MYSQL database of USGS names with results to be displayed via the Leaflet JavaScript library.
+A [web interface](https://johnsherrill.heliohost.org/feature_map.php) for querying a MYSQL database of USGS names with results to be displayed via the Leaflet JavaScript library.
 
 Sources
 ------

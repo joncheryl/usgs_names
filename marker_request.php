@@ -8,11 +8,11 @@ $numbs_of_markers = $_GET['numbs_of_markers'];
 $class_of_markers = $_GET['class_of_markers'];
 
 // Build query
-$sql = "SELECT * FROM utah_names" .
-     " WHERE feature_class = '" . $class_of_markers . "'" .
+$sql = "SELECT * FROM FEATURES" .
+     " WHERE FEATURE_CLASS = '" . $class_of_markers . "'" .
      " AND ELEV_IN_FT > " . $min_elev .
      " ORDER BY ELEV_IN_FT DESC" .
-     " LIMIT " . $numbs_of_markers;
+     " LIMIT " . $numbs_of_markers . ";" ;
 
 // Ask the database
 $result = mysqli_query($mysqli, $sql);

@@ -53,11 +53,11 @@
 			
 			include_once('connection.php');
 
-			$sql = mysqli_query($mysqli, "SELECT DISTINCT feature_class FROM utah_names");
+			$sql = mysqli_query($mysqli, "SELECT DISTINCT FEATURE_CLASS FROM FEATURES;");
 
 			while ($row = $sql->fetch_assoc()){
 			    
-			    echo "<option value='" . $row['feature_class'] . "'>" . $row['feature_class'] . "</option>"; 
+			    echo "<option value='" . $row['FEATURE_CLASS'] . "'>" . $row['FEATURE_CLASS'] . "</option>"; 
 			}
 
 			?>
@@ -94,7 +94,7 @@
 		     event.preventDefault(); // page refreshes otherwise
 
 		     // request and add markers
-		     $.getJSON("https://johnsherrill.heliohost.org/marker_request.php?min_elev=" + elevation + "&numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers, function (data) {
+		     $.getJSON("http://gussies.website/marker_request.php?min_elev=" + elevation + "&numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers, function (data) {
 
 			 markerArray = [];
 			 

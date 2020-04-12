@@ -6,13 +6,27 @@ include_once('connection.php');
 $min_elev = $_GET['min_elev'];
 $numbs_of_markers = $_GET['numbs_of_markers'];
 $class_of_markers = $_GET['class_of_markers'];
+$how_select = $_GET['how_select'];
 
-// Build query
-$sql = "SELECT * FROM FEATURES" .
-     " WHERE FEATURE_CLASS = '" . $class_of_markers . "'" .
-     " AND ELEV_IN_FT > " . $min_elev .
-     " ORDER BY ELEV_IN_FT DESC" .
-     " LIMIT " . $numbs_of_markers . ";" ;
+if ($how_select == "bystate") {
+
+   // Build query
+   $sql = "SELECT * FROM FEATURES" .
+   " WHERE FEATURE_CLASS = '" . $class_of_markers . "'" .
+   " AND ELEV_IN_FT > " . $min_elev .
+   " ORDER BY ELEV_IN_FT DESC" .
+   " LIMIT " . $numbs_of_markers . ";" ;
+
+}
+if ($how_select == "bycounty") {
+
+$sql = "SELECT * FROM (SELECT row_number() over (PARTITION by COUNTY_NUMERIC ORDER BY ELEV_IN_FT desc) as topn, " . 
+     "FEATURE_NAME, FEATURE_CLASS, COUNTY_NAME, COUNTY_NUMERIC, ELEV_IN_FT, PRIM_LAT_DEC, PRIM_LONG_DEC " .
+     "FROM FEATURES " .
+     "WHERE FEATURE_CLASS ='" . $class_of_markers . "') as x " .
+     "WHERE (x.topn <= " . $numbs_of_markers . ") " .
+     "ORDER BY COUNTY_NUMERIC, ELEV_IN_FT;";
+}
 
 // Ask the database
 $result = mysqli_query($mysqli, $sql);

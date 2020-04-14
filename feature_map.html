@@ -53,7 +53,9 @@
 		  $("#county").load("http://gussies.website/counties.php?choice=" + $("#state").val());
 	      }
 	  });
-			     
+
+      $("#feat_class").load("http://gussies.website/classes.php");
+                 
       });
       
     </script>
@@ -113,18 +115,8 @@
 	  </select><br><br>
 
 	  Class of features to display:
-	  <select name='feat_class'>
-	    <!-- get rid of this php -->
-	    <?php
-	     
-	     include_once('connection.php');
-	     $sql = mysqli_query($mysqli, "SELECT DISTINCT feature_class FROM features;");
-	     while ($row = $sql->fetch_assoc()){
-	    echo "<option value='" . $row['feature_class'] . "'>" . $row['feature_class'] . "</option>"; 
-	    }
-
-	    ?>
-	  </select>
+	  <select name='feat_class' id='feat_class'>
+      </select>
 	  <br><br>
 	  
 	  # of markers per grouping:

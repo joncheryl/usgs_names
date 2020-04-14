@@ -12,70 +12,131 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+
+    <script>
+
+      $(document).ready(function() {
+	  $("#how").change(function() {
+
+	      $("#state").empty();
+	      $("#county").empty();
+
+	      var selection_style = $("#how").val()
+
+	      switch(selection_style) {
+	      case "withinnation":
+		  $("#state").append("<option>option not needed</option>");
+		  $("#county").append("<option>option not needed</option>");
+		  break;
+	      case "withinstate":
+		  $("#state").load("http://gussies.website/states.php");
+		  $("#county").append("<option>option not needed</option>");
+		  break;
+	      case "withincounty":
+		  $("#state").load("http://gussies.website/states.php");
+		  $("#county").append("<option>select a state</option>");
+		  break;
+	      case "bystate":
+		  $("#state").append("<option>option not needed</option>");
+		  $("#county").append("<option>option not needed</option>");
+		  break;
+	      case "bycounty":
+		  $("#state").load("http://gussies.website/states.php");
+		  $("#county").append("<option>option not needed</option>");
+		  break;
+	      }	  
+	  });
+
+	  $("#state").change(function() {
+	      if ($("#how").val() == "withincounty") {
+		  $("#county").load("http://gussies.website/counties.php?choice=" + $("#state").val());
+	      }
+	  });
+			     
+      });
+      
+    </script>
+    
   </head>
 
   <style>
 
+    body{
+	padding: 0;
+	margin: 0;
+    }
     .container{
 	display: flex;
+	height: 100vh;
     }
     .sidenav{
-	width: 200px;
+	width: 220px;
+	padding: 10px;
     }
     .flex-item{
 	flex-grow: 1;
-	height: 700px;
     }
     
   </style>
 
   <body>
-    
+
     <div class="container">
       <div class="sidenav">
-	<form>
+	<h1>What are the highest things?</h1>
+	You can select diffent ways to search. For example, search for the highest stuff within the country or search for the highest stuff within each county for a chosen state. The dataset is <a href="https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data">here</a>.
+	<br>
+	<hr>
 
-	  Statewide or by county:
-	  <select name='how'>
-	    <option value='bystate'>By State</option>
-	    <option value='bycounty'>By County</option>
+  	How do you want to search?<br>
+	
+	<form>
+	  <select name='how' id='how'>
+	    <option value='withinnation'>Within the US of A</option>
+	    <option value='withinstate'>Within a state</option>
+	    <option value='withincounty'>Within a county</option>
+	    <option value='bystate'>By states</option>
+	    <option value='bycounty'>By counties within a state</option>
+
 	  </select>
 	  <br><br>
-	  
-	  Elevation (in feet) >:
-	  <input type="text" name="elev">
-	  <br><br>
 
-	  Max number of markers:
-	  <input type="text" name="num_of_markers">
-	  <br><br>
-	  
+	  State:<br>
+	  <select name='state' id='state'>
+	    <option>option not needed</option>
+	  </select><br>
+
+	  County:<br>
+	  <select name='county' id='county'>
+	    <option>option not needed</option>
+	  </select><br><br>
+
 	  Class of features to display:
 	  <select name='feat_class'>
-
+	    <!-- get rid of this php -->
 	    <?php
 	     
 	     include_once('connection.php');
-
-	     $sql = mysqli_query($mysqli, "SELECT DISTINCT FEATURE_CLASS FROM FEATURES;");
-
+	     $sql = mysqli_query($mysqli, "SELECT DISTINCT feature_class FROM features;");
 	     while ($row = $sql->fetch_assoc()){
-	    
-	    echo "<option value='" . $row['FEATURE_CLASS'] . "'>" . $row['FEATURE_CLASS'] . "</option>"; 
+	    echo "<option value='" . $row['feature_class'] . "'>" . $row['feature_class'] . "</option>"; 
 	    }
 
 	    ?>
-
 	  </select>
 	  <br><br>
 	  
-	  <input type="submit" value="Submit" name="class" id="sub_button">
+	  # of markers per grouping:
+	  <input type="text" name="num_of_markers" value="1">
+	  <br><br>
 
+	  <input type="submit" value="Fetch things" name="class" id="sub_button">
 	</form>
 
 	<script>
 	  //
-	  // go get the markers we want
+	  // get the markers we want
 	  //
 
 	  // make submit button do stuff
@@ -89,8 +150,9 @@
 
 	      // get info for query
 	      var first_form = document.querySelector("form");
-	      var how_select = first_form.elements.how.value;
-	      var elevation = first_form.elements.elev.value;
+	      var how_choice = first_form.elements.how.value;
+	      var state_choice = first_form.elements.state.value;
+	      var county_choice = first_form.elements.county.value;
 	      var number_of_markers = first_form.elements.num_of_markers.value;
 	      var class_of_markers = first_form.elements.feat_class.value;
 
@@ -99,7 +161,7 @@
 	      event.preventDefault(); // page refreshes otherwise
 
 	      // request and add markers
-	      $.getJSON("http://gussies.website/marker_request.php?min_elev=" + elevation + "&numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers + "&how_select=" + how_select, function (data) {
+	      $.getJSON("http://gussies.website/marker_request.php?numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers + "&how_choice=" + how_choice + "&state_choice=" + state_choice + "&county_choice=" + county_choice, function (data) {
 
 		  markerArray = [];
 		  
@@ -107,10 +169,10 @@
 		  $.each(data.features, function(index, d){
 		      var mama = new L.marker(d.geometry.coordinates);
 		      mama.bindPopup(
-			  d.properties.FEATURE_NAME + '<br>' +
-			      d.properties.FEATURE_CLASS + '<br>' +
-			      d.properties.ELEV_IN_FT + ' ft<br>' +
-			      d.properties.COUNTY_NAME + ' County'
+			  d.properties.feature_name + '<br>' +
+			      d.properties.feature_class + '<br>' +
+			      d.properties.elev_in_ft + ' ft<br>' +
+			      d.properties.county_name + ' County'
 		      );
 		      markerArray.push(mama);
 		  });
@@ -119,13 +181,12 @@
 		  group = L.featureGroup(markerArray).addTo(mymap);
 
 		  // zoom to fit markers
-		  mymap.fitBounds(group.getBounds());
+		  mymap.fitBounds(group.getBounds(), {maxZoom: 15});
 		  
 	      });
 	  }
 	  </script>
 
-	<br><br> Goal: Create a web interface for querying a MYSQL database of USGS names with results to be displayed via the Leaflet JavaScript library. Currently restricted to only Utah features.
       </div>
 
       <div class="flex-item" id="mapid">

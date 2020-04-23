@@ -15,48 +15,47 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 
     <script>
+     $(document).ready(function() {
+       $("#how").change(function() {
 
-      $(document).ready(function() {
-	  $("#how").change(function() {
+	 $("#state").empty();
+	 $("#county").empty();
 
-	      $("#state").empty();
-	      $("#county").empty();
+	 var selection_style = $("#how").val()
 
-	      var selection_style = $("#how").val()
+	 switch(selection_style) {
+	   case "withinnation":
+	     $("#state").append("<option>option not needed</option>");
+	     $("#county").append("<option>option not needed</option>");
+	     break;
+	   case "withinstate":
+	     $("#state").load("http://gussies.website/states.php");
+	     $("#county").append("<option>option not needed</option>");
+	     break;
+	   case "withincounty":
+	     $("#state").load("http://gussies.website/states.php");
+	     $("#county").append("<option>select a state</option>");
+	     break;
+	   case "bystate":
+	     $("#state").append("<option>option not needed</option>");
+	     $("#county").append("<option>option not needed</option>");
+	     break;
+	   case "bycounty":
+	       $("#state").load("http://gussies.website/states.php");
+	       $("#county").append("<option>option not needed</option>");
+	       break;
+	   }	  
+       });
 
-	      switch(selection_style) {
-	      case "withinnation":
-		  $("#state").append("<option>option not needed</option>");
-		  $("#county").append("<option>option not needed</option>");
-		  break;
-	      case "withinstate":
-		  $("#state").load("http://gussies.website/states.php");
-		  $("#county").append("<option>option not needed</option>");
-		  break;
-	      case "withincounty":
-		  $("#state").load("http://gussies.website/states.php");
-		  $("#county").append("<option>select a state</option>");
-		  break;
-	      case "bystate":
-		  $("#state").append("<option>option not needed</option>");
-		  $("#county").append("<option>option not needed</option>");
-		  break;
-	      case "bycounty":
-		  $("#state").load("http://gussies.website/states.php");
-		  $("#county").append("<option>option not needed</option>");
-		  break;
-	      }	  
-	  });
+       $("#state").change(function() {
+	 if ($("#how").val() == "withincounty") {
+	   $("#county").load("http://gussies.website/counties.php?choice=" + $("#state").val());
+	 }
+       });
 
-	  $("#state").change(function() {
-	      if ($("#how").val() == "withincounty") {
-		  $("#county").load("http://gussies.website/counties.php?choice=" + $("#state").val());
-	      }
-	  });
-
-      $("#feat_class").load("http://gussies.website/classes.php");
+       $("#feat_class").load("http://gussies.website/classes.php");
                  
-      });
+     });
       
     </script>
     
@@ -65,21 +64,21 @@
   <style>
 
     body{
-	padding: 0;
-	margin: 0;
+      padding: 0;
+      margin: 0;
     }
     .container{
-	display: flex;
-	height: 100vh;
+      display: flex;
+      height: 100vh;
     }
-    .sidenav{
-	width: 220px;
-	padding: 10px;
-    }
-    .flex-item{
-	flex-grow: 1;
-    }
-    
+   .sidenav{
+     width: 220px;
+     padding: 10px;
+   }
+   .flex-item{
+     flex-grow: 1;
+   }
+   
   </style>
 
   <body>
@@ -100,7 +99,6 @@
 	    <option value='withincounty'>Within a county</option>
 	    <option value='bystate'>By states</option>
 	    <option value='bycounty'>By counties within a state</option>
-
 	  </select>
 	  <br><br>
 
@@ -127,57 +125,57 @@
 	</form>
 
 	<script>
-	  //
-	  // get the markers we want
-	  //
+	 //
+	 // get the markers we want
+	 //
 
-	  // make submit button do stuff
-	  var sub_botton = document.getElementById("sub_botton");
-	  sub_button.addEventListener("click", getMarkers, false);
+	 // make submit button do stuff
+	 var sub_botton = document.getElementById("sub_botton");
+	 sub_button.addEventListener("click", getMarkers, false);
 
-	  // setup marker layer
-	  var markerArray = [];
-	  var group = L.featureGroup(markerArray);
-	  function getMarkers(event){
+	 // setup marker layer
+	 var markerArray = [];
+	 var group = L.featureGroup(markerArray);
+	 function getMarkers(event){
 
-	      // get info for query
-	      var first_form = document.querySelector("form");
-	      var how_choice = first_form.elements.how.value;
-	      var state_choice = first_form.elements.state.value;
-	      var county_choice = first_form.elements.county.value;
-	      var number_of_markers = first_form.elements.num_of_markers.value;
-	      var class_of_markers = first_form.elements.feat_class.value;
+	   // get info for query
+	   var first_form = document.querySelector("form");
+	   var how_choice = first_form.elements.how.value;
+	   var state_choice = first_form.elements.state.value;
+	   var county_choice = first_form.elements.county.value;
+	   var number_of_markers = first_form.elements.num_of_markers.value;
+	   var class_of_markers = first_form.elements.feat_class.value;
 
-	      // setup map for new markers
-	      mymap.removeLayer(group);
-	      event.preventDefault(); // page refreshes otherwise
+	   // setup map for new markers
+	   mymap.removeLayer(group);
+	   event.preventDefault(); // page refreshes otherwise
 
-	      // request and add markers
-	      $.getJSON("http://gussies.website/marker_request.php?numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers + "&how_choice=" + how_choice + "&state_choice=" + state_choice + "&county_choice=" + county_choice, function (data) {
+	   // request and add markers
+	   $.getJSON("http://gussies.website/marker_request.php?numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers + "&how_choice=" + how_choice + "&state_choice=" + state_choice + "&county_choice=" + county_choice, function (data) {
 
-		  markerArray = [];
-		  
-		  // build an array of markers
-		  $.each(data.features, function(index, d){
-		      var mama = new L.marker(d.geometry.coordinates);
-		      mama.bindPopup(
-			  d.properties.feature_name + '<br>' +
-			      d.properties.feature_class + '<br>' +
-			      d.properties.elev_in_ft + ' ft<br>' +
-			      d.properties.county_name + ' County'
-		      );
-		      markerArray.push(mama);
-		  });
+	     markerArray = [];
+	     
+	     // build an array of markers
+	     $.each(data.features, function(index, d){
+	       var mama = new L.marker(d.geometry.coordinates);
+	       mama.bindPopup(
+		 d.properties.feature_name + '<br>' +
+		 d.properties.feature_class + '<br>' +
+		 d.properties.elev_in_ft + ' ft<br>' +
+		 d.properties.county_name + ' County'
+	       );
+	       markerArray.push(mama);
+	     });
 
-		  // add the array to the map
-		  group = L.featureGroup(markerArray).addTo(mymap);
+	     // add the array to the map
+	     group = L.featureGroup(markerArray).addTo(mymap);
 
-		  // zoom to fit markers
-		  mymap.fitBounds(group.getBounds(), {maxZoom: 15});
-		  
-	      });
-	  }
-	  </script>
+	     // zoom to fit markers
+	     mymap.fitBounds(group.getBounds(), {maxZoom: 15});
+	     
+	   });
+	 }
+	</script>
 
       </div>
 
@@ -185,19 +183,19 @@
 
 	<script>
 
-	  //
-	  // Build map
-	  //
-	  
-	  // map layer
-	  var mymap = L.map('mapid').setView([39.760833, -111.891111], 7);
+	 //
+	 // Build map
+	 //
+	 
+	 // map layer
+	 var mymap = L.map('mapid').setView([39.760833, -111.891111], 7);
 
-	  // tile layer
-	  var tile_layer = L.tileLayer( 'https://tile.opentopomap.org/{z}/{x}/{y}.png', {
-	      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	  }).addTo(mymap);
+	 // tile layer
+	 var tile_layer = L.tileLayer( 'https://tile.opentopomap.org/{z}/{x}/{y}.png', {
+	   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	 }).addTo(mymap);
 
-	  </script>
+	</script>
 
       </div>
 

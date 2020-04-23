@@ -15,8 +15,6 @@ if ($how_choice == "withinnation")
    "WHERE feature_class = '" . $class_of_markers . "' " .
    "ORDER BY elev_in_ft DESC " .
    "LIMIT " . $numbs_of_markers . ";" ;
-
-//$sql = "SELECT * FROM features WHERE feature_class = 'Summit' AND elev_in_ft > 19000 ORDER BY elev_in_ft DESC LIMIT 20";
 }
 elseif ($how_choice == "withinstate")
 {
@@ -40,7 +38,7 @@ elseif ($how_choice == "withincounty")
 elseif ($how_choice == "bystate")
 {
    $sql = "SELECT * FROM (SELECT ROW_NUMBER() over (PARTITION by state_alpha order BY elev_in_ft DESC) AS topn, " . 
-     "feature_name, feature_class, county_name, state_alpha, elev_in_ft, prim_lat_dec, prim_long_dec " .
+     "feature_name, feature_class, state_alpha, elev_in_ft, prim_lat_dec, prim_long_dec " .
      "FROM features " .
      "WHERE feature_class ='" . $class_of_markers . "') AS x " .
      "WHERE (x.topn <= " . $numbs_of_markers . ") " .

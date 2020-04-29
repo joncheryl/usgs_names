@@ -112,12 +112,12 @@
 	    <option>option not needed</option>
 	  </select><br><br>
 
-	  Class of features to display:
+	  Feature type:<br>
 	  <select name='feat_class' id='feat_class'>
       </select>
 	  <br><br>
 	  
-	  # of markers per grouping:
+	  # of markers per grouping:<br>
 	  <input type="text" name="num_of_markers" value="1">
 	  <br><br>
 
@@ -160,19 +160,23 @@
 	       var mama = new L.marker(d.geometry.coordinates);
 	       mama.bindPopup(
 		 d.properties.feature_name + '<br>' +
-		 d.properties.feature_class + '<br>' +
+		 d.properties.county_name + ' County, ' +
+		 d.properties.state_alpha + '<br>' +
 		 d.properties.elev_in_ft + ' ft<br>' +
-		 d.properties.county_name + ' County'
+		 'feature type: ' + d.properties.feature_class
 	       );
 	       markerArray.push(mama);
 	     });
 
-	     // add the array to the map
-	     group = L.featureGroup(markerArray).addTo(mymap);
+	     if (markerArray.length == 0) {
+	       alert("No features were found having the selected criteria.");
+	     } else {
+	       // add the array to the map
+	       group = L.featureGroup(markerArray).addTo(mymap);
 
-	     // zoom to fit markers
-	     mymap.fitBounds(group.getBounds(), {maxZoom: 15});
-	     
+	       // zoom to fit markers
+	       mymap.fitBounds(group.getBounds(), {maxZoom: 15});
+	     }
 	   });
 	 }
 	</script>

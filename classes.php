@@ -28,6 +28,8 @@ else
 
 $result = mysqli_query($mysqli, $query);
 
+echo "<option>(any)</option>";
+
 while ($row = mysqli_fetch_assoc($result)) {
     echo "<option>" . $row{'feature_class'} . "</option>";
 }

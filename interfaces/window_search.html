@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>USGS Window Search</title>
+    <link rel="stylesheet"
+	  href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+	  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+	  crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+	    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+	    crossorigin="">
+
+     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    
+    <script src="/js/underscore/underscore.js"></script>
+    </script>
+
+    <style>
+     html {
+       height: 100%;
+     }
+     body, #container { height: 100%; margin: 0; padding: 0;}
+
+     #themap {
+       height: 100%;
+     }
+
+     #info {
+       position: absolute;
+       z-index: 1000;
+
+       background: rgba(255, 255, 255, .9);
+       box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
+       display: inline-block;
+
+       right: 10px;
+       top: 100px;
+       padding: 6px 8px;
+       border-radius: 5px;
+     }
+
+    </style>
+    
+  </head>
+
+  <body>
+
+    <div id="themap"></div>
+
+    <div id="info" >
+      <center><b>INPUT</b></center>
+      <form>
+	# of markers to display that <br>
+	are highest in elevation:<br>
+	<input type="text" size="4" id="num_of_markers" value="10">
+
+      </form>
+
+      <hr>
+      <center><b>OUTPUT</b></center>
+      Number of features (hidden <br>
+      and shown) in current window: <br>
+      <input type="text" size="4" id="wFeatureN" value="">
+    </div>
+
+    <script>
+     let markerN = 10;
+
+     const getMarkers = _.debounce(function(e) {
+
+       // setup map for new markers
+       group.clearLayers();
+
+       let test = mymap.getBounds().pad(-.18);
+
+       $.getJSON("http://gussies.website/marker_window.php?markerN=" + markerN + "&north=" + test.getNorth() + "&south=" + test.getSouth() + "&east=" + test.getEast() + "&west=" + test.getWest(), function (data) {
+
+	 markerArray = [];
+	 
+	 // display total number of features in window
+	 document.getElementById("wFeatureN").value = data.window_N;
+	 
+	 // build an array of markers
+	 $.each(data.features, function(index, d){
+	   var mama = new L.marker(d.geometry.coordinates);
+	   let this_popup = L.popup({autoPan:false}).setContent(
+	     d.properties.feature_name + '<br>' +
+	     d.properties.county_name + ' County, ' +
+	     d.properties.state_alpha + '<br>' +
+	     d.properties.elev_in_ft + ' ft<br>' +
+	     'feature type: ' + d.properties.feature_class
+	   );
+	   mama.bindPopup(this_popup);
+	   markerArray.push(mama);
+	 });
+
+	 if (markerArray.length == 0) {
+	   alert("No features were found in the viewing range.");
+	 } else {
+	   // add the array to the map
+	   group = L.featureGroup(markerArray).addTo(mymap);
+	 }
+       });
+     }, 1000);
+
+     var mymap = L.map('themap', {debounceMoveend: true}).setView([40.7, -111.8], 10);
+
+     var Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
+       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+       subdomains: 'abcd',
+       minZoom: 0,
+       maxZoom: 18,
+       ext: 'png'
+     });
+     
+     Stamen_Terrain.addTo(mymap);
+     
+     // setup marker layer
+     var markerArray = [];
+     var group = L.featureGroup(markerArray);
+
+     mymap.on('movestart', function(){
+       group.clearLayers();
+     });
+     
+     mymap.on('moveend', getMarkers)
+
+
+     const input = document.getElementById('num_of_markers');
+     input.addEventListener('input', updateMarkerN);
+     function updateMarkerN(e) {
+       // setup map for new markers
+       group.clearLayers();
+
+       markerN = e.target.value;
+
+       getMarkers();
+     }
+    </script>
+
+  </body>  
+</html>

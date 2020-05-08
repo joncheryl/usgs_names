@@ -12,7 +12,7 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 
     <script>
      $(document).ready(function() {
@@ -29,11 +29,11 @@
 	     $("#county").append("<option>option not needed</option>");
 	     break;
 	   case "withinstate":
-	     $("#state").load("http://gussies.website/states.php");
+	     $("#state").load("https://gussies.website/states.php");
 	     $("#county").append("<option>option not needed</option>");
 	     break;
 	   case "withincounty":
-	     $("#state").load("http://gussies.website/states.php");
+	     $("#state").load("https://gussies.website/states.php");
 	     $("#county").append("<option>select a state</option>");
 	     break;
 	   case "bystate":
@@ -41,7 +41,7 @@
 	     $("#county").append("<option>option not needed</option>");
 	     break;
 	   case "bycounty":
-	       $("#state").load("http://gussies.website/states.php");
+	       $("#state").load("https://gussies.website/states.php");
 	       $("#county").append("<option>option not needed</option>");
 	       break;
 	   }	  
@@ -49,11 +49,11 @@
 
        $("#state").change(function() {
 	 if ($("#how").val() == "withincounty") {
-	   $("#county").load("http://gussies.website/counties.php?choice=" + $("#state").val());
+	   $("#county").load("https://gussies.website/counties.php?choice=" + $("#state").val());
 	 }
        });
 
-       $("#feat_class").load("http://gussies.website/classes.php");
+       $("#feat_class").load("https://gussies.website/classes.php");
                  
      });
       
@@ -151,7 +151,7 @@
 	   event.preventDefault(); // page refreshes otherwise
 
 	   // request and add markers
-	   $.getJSON("http://gussies.website/marker_request.php?numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers + "&how_choice=" + how_choice + "&state_choice=" + state_choice + "&county_choice=" + county_choice, function (data) {
+	   $.getJSON("https://gussies.website/marker_request.php?numbs_of_markers=" + number_of_markers + "&class_of_markers=" + class_of_markers + "&how_choice=" + how_choice + "&state_choice=" + state_choice + "&county_choice=" + county_choice, function (data) {
 
 	     markerArray = [];
 	     

@@ -52,23 +52,42 @@
     <div id="themap"></div>
 
     <div id="info" >
-      <center><b>INPUT</b></center>
-      <form>
-	# of markers to display that <br>
-	are highest in elevation:<br>
-	<input type="text" size="4" id="num_of_markers" value="10">
+	This map displays the highest <br>
+	features from <a href="https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data">this</a> dataset that <br>
+	are located in the current map<br>
+	window.	Move the map to <br>
+	update the pins. <br>
+	<hr>
 
+	<form>
+	# of pins to display: <br>
+	<input type="text" size="4" id="num_of_markers" value="10">
       </form>
 
       <hr>
-      <center><b>OUTPUT</b></center>
       Number of features (hidden <br>
       and shown) in current window: <br>
       <input type="text" size="4" id="wFeatureN" value="">
     </div>
 
     <script>
+     // general map setup
+     var mymap = L.map('themap').setView([40.7, -111.8], 10);
+
+     var Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
+       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+       subdomains: 'abcd',
+       minZoom: 0,
+       maxZoom: 18,
+       ext: 'png'
+     });
+     
+     Stamen_Terrain.addTo(mymap);
+     
+     // setup marker layer
      let markerN = 10;
+     let markerArray = [];
+     let group = L.featureGroup(markerArray);
 
      const getMarkers = _.debounce(function(e) {
 
@@ -105,41 +124,26 @@
 	   group = L.featureGroup(markerArray).addTo(mymap);
 	 }
        });
-     }, 1000);
+     }, 500);
 
-     var mymap = L.map('themap', {debounceMoveend: true}).setView([40.7, -111.8], 10);
-
-     var Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
-       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-       subdomains: 'abcd',
-       minZoom: 0,
-       maxZoom: 18,
-       ext: 'png'
-     });
-     
-     Stamen_Terrain.addTo(mymap);
-     
-     // setup marker layer
-     var markerArray = [];
-     var group = L.featureGroup(markerArray);
-
+     // clear markers when map is moved and the get new markers
      mymap.on('movestart', function(){
        group.clearLayers();
      });
-     
      mymap.on('moveend', getMarkers)
 
-
+	// if user changes marker number, do this stuff
      const input = document.getElementById('num_of_markers');
      input.addEventListener('input', updateMarkerN);
      function updateMarkerN(e) {
-       // setup map for new markers
-       group.clearLayers();
+	 // update variable with new number of markers
+	 markerN = e.target.value;
 
-       markerN = e.target.value;
-
-       getMarkers();
+	 // change them
+	 getMarkers();  
      }
+
+    getMarkers();
     </script>
 
   </body>  
